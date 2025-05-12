@@ -17,5 +17,5 @@ jobs:
       # 指纹
       SSH_KNOWN_HOST: ${{ secrets.SSH_KNOWN_HOST }}
     steps:
-      - name: Get IP Address  # 必须给 step 命名
-        run: ip addr 
+      - name: Show nginx
+        run: ls /home/nginx-1.27.4/logs
