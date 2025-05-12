@@ -1,5 +1,5 @@
 name: MY Action Demo
-run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
+run-name: ${{ github.actor }} is testing out GitHub Actions  
 on: [push]
 jobs:
   publish:
@@ -16,7 +16,7 @@ jobs:
       SSH_HOST: ${{ secrets.SSH_HOST }}
       # 指纹
       SSH_KNOWN_HOST: ${{ secrets.SSH_KNOWN_HOST }}
- steps:
+    steps:
       # 创建ssh目录, 并启动ssh代理
       - name: setup ssh
         shell: bash
@@ -25,7 +25,7 @@ jobs:
       # 保存公钥到known_hosts
       - name: configure ssh public key
         shell: bash
-        run: echo "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+        run: echo "$SSH_KNOWN_HOST" > ~/.ssh/known_hosts
       # 保存私钥到ssh-agent
       - name: setup ssh private key
         shell: bash
@@ -34,13 +34,11 @@ jobs:
           eval $(ssh-agent)
           # 将进程信息保存到环境变量, 方便后面的程序使用, 如docker
           echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" >> $GITHUB_ENV
-          echo "SSH_AGENT_PID=SSH_AGENT_PID" >> $GITHUB_ENV
+          echo "SSH_AGENT_PID=$SSH_AGENT_PID" >> $GITHUB_ENV
           # 将密钥添加的ssh-agent
           echo "$SSH_PRIVATE_KEY" | ssh-add -
-      # 创建并使用docker远程上下文
-      - name: create and use docker remote context
+      # nginx验证
+      - name: check status nginx
         shell: bash
         run: |
           systemctl status nginx
-
-     
