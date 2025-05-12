@@ -1,18 +1,46 @@
-name: GitHub Actions Demo
+name: MY Action Demo
 run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
 on: [push]
 jobs:
-  Explore-GitHub-Actions:
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
-      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
-      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
-      - name: Check out repository code
-        uses: actions/checkout@v4
-      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
-      - run: echo "🖥️ The workflow is now ready to test your code on the runner."
-      - name: List files in the repository
+  publish:
+    # 指定环境, 即创建环境机密时, 给环境的命名. 当然如果你创建的是仓库机密, 则无需下面这行
+    environment: deploy to tencent
+    # 指定在Ubuntu机器上运行此工作流
+    runs-on: [self-hosted, linux]
+    env:
+      # 私钥
+      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      # 用户名
+      SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
+      # 主机地址
+      SSH_HOST: ${{ secrets.SSH_HOST }}
+      # 指纹
+      SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOST }}
+ steps:
+      # 创建ssh目录, 并启动ssh代理
+      - name: setup ssh
+        shell: bash
         run: |
-          ls ${{ github.workspace }}
-      - run: echo "🍏 This job's status is ${{ job.status }}."
+          mkdir -p $HOME/.ssh
+      # 保存公钥到known_hosts
+      - name: configure ssh public key
+        shell: bash
+        run: echo "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+      # 保存私钥到ssh-agent
+      - name: setup ssh private key
+        shell: bash
+        run: |
+          # 启动ssh-agent
+          eval $(ssh-agent)
+          # 将进程信息保存到环境变量, 方便后面的程序使用, 如docker
+          echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" >> $GITHUB_ENV
+          echo "SSH_AGENT_PID=SSH_AGENT_PID" >> $GITHUB_ENV
+          # 将密钥添加的ssh-agent
+          echo "$SSH_PRIVATE_KEY" | ssh-add -
+      # 创建并使用docker远程上下文
+      - name: create and use docker remote context
+        shell: bash
+        run: |
+          systemctl status nginx
+
+     
