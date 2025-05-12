@@ -15,7 +15,7 @@ jobs:
       # 主机地址
       SSH_HOST: ${{ secrets.SSH_HOST }}
       # 指纹
-      SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOST }}
+      SSH_KNOWN_HOST: ${{ secrets.SSH_KNOWN_HOST }}
  steps:
       # 创建ssh目录, 并启动ssh代理
       - name: setup ssh
